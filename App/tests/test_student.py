@@ -6,7 +6,6 @@ from App.database import db, create_db
 from App.models import Student
 from App.controllers import (
     create_student,
-    get_karma,
     get_student_by_id,
     get_student_by_UniId,
     get_student_by_username,
@@ -29,34 +28,32 @@ class StudentUnitTests(unittest.TestCase):
 
     def test_get_json(self):
         student = Student(username="billy", firstname="Billy", lastname="John", email="billy@example.com", password="billypass", faculty="FST", admittedTerm="2022/2023", UniId="816000000", degree="BSc Computer Science", gpa="3.5")
-        karma = get_karma(student.karmaID)
-        student_json = student.to_json(karma)
-        print(student_json)
-        self.assertDictEqual(student_json, {"studentID": None,
-                                            "username": "billy",
-                                            "firstname": "Billy",
-                                            "lastname": "John",
-                                            "gpa": "3.5",
-                                            "email": "billy@example.com",
-                                            "faculty": "FST",
-                                            "degree": "BSc Computer Science",
-                                            "admittedTerm": "2022/2023",
-                                            "UniId": "816000000",
-                                            # "reviews": [],
-                                            "accomplishments": [],
-                                            "incidents": [],
-                                            "grades": [],
-                                            "transcripts": [],
-                                            "karmaScore": None,
-                                            "karmaRank": None})
-
+        student_json = student.to_json()
+        expected_json = {
+            "studentID": None,
+            "username": "billy",
+            "firstname": "Billy",
+            "lastname": "John",
+            "gpa": "3.5",
+            "email": "billy@example.com",
+            "faculty": "FST",
+            "degree": "BSc Computer Science",
+            "admittedTerm": "2022/2023",
+            "UniId": "816000000",
+            "accomplishments": [],
+            "incidents": [],
+            "grades": [],
+            "transcripts": [],
+            "karmaScore": 0
+        }
+        self.assertDictEqual(student_json, expected_json)
 
 '''
     Integration Tests
 '''
 
 # This fixture creates an empty database for the test and deletes it after the test
-# scope="class" would execute the fixture once and resued for all methods in the class
+# scope="class" would execute the fixture once and reused for all methods in the class
 @pytest.fixture(autouse=True, scope="module")
 def empty_db():
     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
